@@ -2,8 +2,8 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../src/Counter.sol";
-import "../src/proxyerc20.sol";
+import "../src/Erc20proxyclone.sol";
+import "../src/Proxyclone.sol";
 
 contract TokenFactoryTest is Test {
     ERC20 public masterContract;
