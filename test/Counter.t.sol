@@ -1,24 +1,31 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console} from "forge-std/Test.sol";
-import {Counter} from "../src/Counter.sol";
+import "forge-std/Test.sol";
+import "../src/Counter.sol";
+import "../src/proxyerc20.sol";
 
-contract CounterTest is Test {
-    Counter public counter;
+contract TokenFactoryTest is Test {
+    ERC20 public masterContract;
+    TokenFactory public tokenFactory;
 
     function setUp() public {
-        counter = new Counter();
-        counter.setNumber(0);
+        masterContract = new ERC20();
+        tokenFactory = new TokenFactory(address(masterContract));
     }
 
-    function test_Increment() public {
-        counter.increment();
-        assertEq(counter.number(), 1);
-    }
+    function testCreateToken() public {
+        string memory name = "Test Token";
+        string memory symbol = "TTK";
+        uint256 initialSupply = 1000;
 
-    function testFuzz_SetNumber(uint256 x) public {
-        counter.setNumber(x);
-        assertEq(counter.number(), x);
+        address clone = tokenFactory.createToken(name, symbol, initialSupply);
+
+        ERC20 clonedToken = ERC20(clone);
+
+        assertEq(clonedToken.name(), name);
+        assertEq(clonedToken.symbol(), symbol);
+        assertEq(clonedToken.totalSupply(), initialSupply * 10 ** uint256(clonedToken.decimals()));
+        assertEq(clonedToken.balanceOf(address(this)), initialSupply * 10 ** uint256(clonedToken.decimals()));
     }
 }
